@@ -8,13 +8,30 @@ exports.publishPageCron = catchAsyncErrors(async () => {
     cron.schedule("* * * * *", async () => {
         try {
             console.log("Publish cron job running...");
+            // const date = new Date();
+            // const currentDate = date.toLocaleDateString();
+            // const currentTime = date.toLocaleTimeString("default", {
+            //     hour: "2-digit",
+            //     minute: "2-digit",
+            //     hour12: false,
+            // });
+
+            // const scheduledPublications = await SchedulePublication.find({
+            //     status: "Scheduled",
+            //     publishDate: currentDate,
+            //     publishTime: currentTime,
+            // }).populate("createdBy");
+
             const date = new Date();
-            const currentDate = date.toLocaleDateString();
-            const currentTime = date.toLocaleTimeString("default", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-            });
+
+            const indiaTime = new Date(
+                date.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+            );
+            const currentDate = indiaTime.toISOString().split("T")[0]; 
+            const currentTime = indiaTime
+                .toISOString()
+                .split("T")[1]
+                .slice(0, 5);
 
             const scheduledPublications = await SchedulePublication.find({
                 status: "Scheduled",
@@ -39,7 +56,6 @@ exports.publishPageCron = catchAsyncErrors(async () => {
                 console.log(
                     `Page ${page._id} published at ${currentDate} ${currentTime}`
                 );
-
 
                 await sendEmail({
                     email: page.createdBy.email,
